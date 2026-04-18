@@ -16,7 +16,14 @@
    - build list and detail pages for agents and their ailments
    - ensure responsive layout and browser-friendly behavior
 
-4. Validation and review
+4. Minimal home page
+   - create an attractive home page that reflects AgentClinic's mission
+   - include navigation to agent and ailment management sections
+   - add brief messaging about agent well-being and clinic purpose
+   - ensure consistent styling and responsive design with tech stack
+
+5. Validation and review
    - add tests for data model integrity and backend API routes
    - add UI smoke tests for agent and ailment management screens
+   - verify home page renders and navigates correctly
    - review against mission goals and tech stack guidance before merging

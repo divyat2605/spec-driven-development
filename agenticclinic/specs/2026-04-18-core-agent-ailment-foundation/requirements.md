@@ -5,6 +5,7 @@
 - support creating, reading, updating, and deleting agents
 - support creating, reading, updating, and deleting agent ailments
 - provide a simple UI for agents and ailment management
+- create a minimal home page reflecting AgentClinic's mission and values
 
 ## Context
 - aligns with `specs/mission.md` by focusing on agent-centric well-being and staff productivity
