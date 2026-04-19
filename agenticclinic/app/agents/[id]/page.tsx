@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 interface Ailment {
   id: string;
@@ -10,17 +10,27 @@ interface Ailment {
   severity: string;
 }
 
+interface AppointmentSummary {
+  id: string;
+  dateTime: string;
+  duration: number;
+  status: string;
+  therapyType: { id: string; name: string };
+}
+
 interface Agent {
   id: string;
   name: string;
   status: string;
   ailments: Ailment[];
+  appointments: AppointmentSummary[];
   createdAt: string;
   updatedAt: string;
 }
 
 export default function AgentDetail() {
   const params = useParams();
+  const router = useRouter();
   const agentId = params.id as string;
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,7 +86,7 @@ export default function AgentDetail() {
     try {
       const response = await fetch(`/api/agents/${agentId}`, { method: 'DELETE' });
       if (response.ok) {
-        window.location.href = '/agents';
+        router.push('/agents');
       }
     } catch (error) {
       console.error('Error deleting agent:', error);
@@ -101,14 +111,6 @@ export default function AgentDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/" className="text-2xl font-bold text-indigo-600">
-            AgentClinic
-          </Link>
-        </nav>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/agents" className="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
           ← Back to Agents
@@ -143,6 +145,47 @@ export default function AgentDetail() {
               Add
             </button>
           </form>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-900">Appointments</h2>
+          {agent.appointments.length === 0 ? (
+            <p className="text-gray-600">No appointments scheduled for this agent.</p>
+          ) : (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Upcoming</h3>
+                {agent.appointments
+                  .filter((appointment) => new Date(appointment.dateTime) >= new Date())
+                  .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
+                  .map((appointment) => (
+                    <Link href={`/appointments/${appointment.id}`} key={appointment.id}>
+                      <div className="bg-white p-4 rounded-lg shadow border border-gray-200 hover:shadow-lg cursor-pointer transition">
+                        <h4 className="text-lg font-semibold text-gray-900">{appointment.therapyType.name}</h4>
+                        <p className="text-sm text-gray-600">{new Date(appointment.dateTime).toLocaleString()}</p>
+                        <p className="text-sm text-gray-600">Status: {appointment.status}</p>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Past</h3>
+                {agent.appointments
+                  .filter((appointment) => new Date(appointment.dateTime) < new Date())
+                  .sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
+                  .map((appointment) => (
+                    <Link href={`/appointments/${appointment.id}`} key={appointment.id}>
+                      <div className="bg-white p-4 rounded-lg shadow border border-gray-200 hover:shadow-lg cursor-pointer transition">
+                        <h4 className="text-lg font-semibold text-gray-900">{appointment.therapyType.name}</h4>
+                        <p className="text-sm text-gray-600">{new Date(appointment.dateTime).toLocaleString()}</p>
+                        <p className="text-sm text-gray-600">Status: {appointment.status}</p>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
