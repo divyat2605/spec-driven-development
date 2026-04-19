@@ -20,7 +20,8 @@ export default function AilmentsList() {
       try {
         const response = await fetch('/api/ailments');
         if (response.ok) {
-          setAilments(await response.json());
+          const raw = await response.json();
+          setAilments(Array.isArray(raw) ? raw : []);
         }
       } catch (error) {
         console.error('Error fetching ailments:', error);
@@ -44,24 +45,28 @@ export default function AilmentsList() {
           <p className="text-gray-600">No ailments recorded yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ailments.map((ailment) => (
-              <Link href={`/ailments/${ailment.id}`} key={ailment.id}>
-                <div className="h-full cursor-pointer rounded-xl border border-gray-100 border-l-4 border-l-teal-500 bg-white p-6 shadow-md transition duration-200 hover:scale-105 hover:shadow-lg">
-                  <h3 className="text-xl font-bold text-gray-900">{ailment.name}</h3>
-                  <p className="mt-2 text-sm font-medium text-gray-500">
-                    Severity:{' '}
-                    <span className="font-semibold text-gray-800">{ailment.severity}</span>
-                  </p>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Agent:{' '}
-                    <span className="font-medium text-gray-900">{ailment.agent.name}</span>
-                  </p>
-                  <p className="mt-1 text-sm font-medium text-gray-500">
-                    Treatments: <span className="text-gray-900">{ailment.treatments.length}</span>
-                  </p>
-                </div>
-              </Link>
-            ))}
+            {Array.isArray(ailments) &&
+              ailments.map((ailment) => (
+                <Link href={`/ailments/${ailment?.id}`} key={ailment?.id}>
+                  <div className="h-full cursor-pointer rounded-xl border border-gray-100 border-l-4 border-l-teal-500 bg-white p-6 shadow-md transition duration-200 hover:scale-105 hover:shadow-lg">
+                    <h3 className="text-xl font-bold text-gray-900">{ailment?.name}</h3>
+                    <p className="mt-2 text-sm font-medium text-gray-500">
+                      Severity:{' '}
+                      <span className="font-semibold text-gray-800">{ailment?.severity}</span>
+                    </p>
+                    <p className="mt-2 text-sm text-gray-600">
+                      Agent:{' '}
+                      <span className="font-medium text-gray-900">{ailment?.agent?.name}</span>
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-gray-500">
+                      Treatments:{' '}
+                      <span className="text-gray-900">
+                        {Array.isArray(ailment?.treatments) ? ailment.treatments.length : 0}
+                      </span>
+                    </p>
+                  </div>
+                </Link>
+              ))}
           </div>
         )}
       </main>

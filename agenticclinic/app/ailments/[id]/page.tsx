@@ -78,19 +78,23 @@ export default function AilmentDetail() {
         </Link>
 
         <div className="bg-white p-6 rounded-lg shadow">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{ailment.name}</h1>
-          <p className="text-lg text-gray-600 mb-2">Severity: {ailment.severity}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{ailment?.name}</h1>
+          <p className="text-lg text-gray-600 mb-2">Severity: {ailment?.severity}</p>
           <p className="text-lg text-gray-600 mb-2">
             Agent:{' '}
-            <Link href={`/agents/${ailment.agent.id}`} className="text-indigo-600 hover:text-indigo-800">
-              {ailment.agent.name}
+            <Link
+              href={`/agents/${ailment.agent?.id ?? ''}`}
+              className="text-indigo-600 hover:text-indigo-800"
+            >
+              {ailment.agent?.name}
             </Link>
           </p>
           {ailment.description && (
             <p className="text-gray-700 mb-4">{ailment.description}</p>
           )}
           <p className="text-sm text-gray-500 mb-4">
-            Created: {new Date(ailment.createdAt).toLocaleDateString()}
+            Created:{' '}
+            {ailment.createdAt ? new Date(ailment.createdAt).toLocaleDateString() : ''}
           </p>
           <button
             onClick={handleDeleteAilment}

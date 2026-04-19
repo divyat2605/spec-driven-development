@@ -30,9 +30,9 @@ export default function TherapyTypeDetail() {
         if (response.ok) {
           const data = await response.json();
           setTherapyType(data);
-          setName(data.name);
-          setDescription(data.description || '');
-          setDuration(data.duration);
+          setName(data?.name ?? '');
+          setDescription(data?.description || '');
+          setDuration(typeof data?.duration === 'number' ? data.duration : 60);
         }
       } catch (error) {
         console.error('Error fetching therapy type:', error);
@@ -102,9 +102,9 @@ export default function TherapyTypeDetail() {
         </Link>
 
         <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{therapyType.name}</h1>
-          <p className="text-sm text-gray-600 mb-2">Duration: {therapyType.duration} minutes</p>
-          {therapyType.description && (
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{therapyType?.name}</h1>
+          <p className="text-sm text-gray-600 mb-2">Duration: {therapyType?.duration} minutes</p>
+          {therapyType?.description && (
             <p className="text-gray-700 mb-4">{therapyType.description}</p>
           )}
           <button

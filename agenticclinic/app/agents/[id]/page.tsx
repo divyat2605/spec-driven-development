@@ -72,7 +72,8 @@ export default function AgentDetail() {
 
       if (response.ok) {
         const newAilment = await response.json();
-        setAgent({ ...agent, ailments: [...agent.ailments, newAilment] });
+        const prev = Array.isArray(agent.ailments) ? agent.ailments : [];
+        setAgent({ ...agent, ailments: [...prev, newAilment] });
         setNewAilmentName('');
       }
     } catch (error) {
@@ -117,9 +118,12 @@ export default function AgentDetail() {
         </Link>
 
         <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{agent.name}</h1>
-          <p className="text-lg text-gray-600 mb-2">Status: {agent.status}</p>
-          <p className="text-sm text-gray-500">Created: {new Date(agent.createdAt).toLocaleDateString()}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{agent?.name}</h1>
+          <p className="text-lg text-gray-600 mb-2">Status: {agent?.status}</p>
+          <p className="text-sm text-gray-500">
+            Created:{' '}
+            {agent?.createdAt ? new Date(agent.createdAt).toLocaleDateString() : ''}
+          </p>
           <button
             onClick={handleDeleteAgent}
             className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
@@ -149,40 +153,66 @@ export default function AgentDetail() {
 
         <div className="bg-white p-6 rounded-lg shadow mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-gray-900">Appointments</h2>
-          {agent.appointments.length === 0 ? (
+          {!Array.isArray(agent?.appointments) || agent.appointments.length === 0 ? (
             <p className="text-gray-600">No appointments scheduled for this agent.</p>
           ) : (
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Upcoming</h3>
-                {agent.appointments
-                  .filter((appointment) => new Date(appointment.dateTime) >= new Date())
-                  .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
-                  .map((appointment) => (
-                    <Link href={`/appointments/${appointment.id}`} key={appointment.id}>
-                      <div className="bg-white p-4 rounded-lg shadow border border-gray-200 hover:shadow-lg cursor-pointer transition">
-                        <h4 className="text-lg font-semibold text-gray-900">{appointment.therapyType.name}</h4>
-                        <p className="text-sm text-gray-600">{new Date(appointment.dateTime).toLocaleString()}</p>
-                        <p className="text-sm text-gray-600">Status: {appointment.status}</p>
-                      </div>
-                    </Link>
-                  ))}
+                {Array.isArray(agent.appointments) &&
+                  agent.appointments
+                    .filter((appointment) =>
+                      appointment?.dateTime
+                        ? new Date(appointment.dateTime) >= new Date()
+                        : false
+                    )
+                    .sort(
+                      (a, b) =>
+                        new Date(a?.dateTime ?? 0).getTime() - new Date(b?.dateTime ?? 0).getTime()
+                    )
+                    .map((appointment) => (
+                      <Link href={`/appointments/${appointment?.id}`} key={appointment?.id}>
+                        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 hover:shadow-lg cursor-pointer transition">
+                          <h4 className="text-lg font-semibold text-gray-900">
+                            {appointment?.therapyType?.name}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {appointment?.dateTime
+                              ? new Date(appointment.dateTime).toLocaleString()
+                              : ''}
+                          </p>
+                          <p className="text-sm text-gray-600">Status: {appointment?.status}</p>
+                        </div>
+                      </Link>
+                    ))}
               </div>
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Past</h3>
-                {agent.appointments
-                  .filter((appointment) => new Date(appointment.dateTime) < new Date())
-                  .sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
-                  .map((appointment) => (
-                    <Link href={`/appointments/${appointment.id}`} key={appointment.id}>
-                      <div className="bg-white p-4 rounded-lg shadow border border-gray-200 hover:shadow-lg cursor-pointer transition">
-                        <h4 className="text-lg font-semibold text-gray-900">{appointment.therapyType.name}</h4>
-                        <p className="text-sm text-gray-600">{new Date(appointment.dateTime).toLocaleString()}</p>
-                        <p className="text-sm text-gray-600">Status: {appointment.status}</p>
-                      </div>
-                    </Link>
-                  ))}
+                {Array.isArray(agent.appointments) &&
+                  agent.appointments
+                    .filter((appointment) =>
+                      appointment?.dateTime ? new Date(appointment.dateTime) < new Date() : false
+                    )
+                    .sort(
+                      (a, b) =>
+                        new Date(b?.dateTime ?? 0).getTime() - new Date(a?.dateTime ?? 0).getTime()
+                    )
+                    .map((appointment) => (
+                      <Link href={`/appointments/${appointment?.id}`} key={appointment?.id}>
+                        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 hover:shadow-lg cursor-pointer transition">
+                          <h4 className="text-lg font-semibold text-gray-900">
+                            {appointment?.therapyType?.name}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {appointment?.dateTime
+                              ? new Date(appointment.dateTime).toLocaleString()
+                              : ''}
+                          </p>
+                          <p className="text-sm text-gray-600">Status: {appointment?.status}</p>
+                        </div>
+                      </Link>
+                    ))}
               </div>
             </div>
           )}
@@ -190,18 +220,19 @@ export default function AgentDetail() {
 
         <div>
           <h2 className="text-2xl font-semibold mb-4 text-gray-900">Ailments</h2>
-          {agent.ailments.length === 0 ? (
+          {!Array.isArray(agent?.ailments) || agent.ailments.length === 0 ? (
             <p className="text-gray-600">No ailments recorded for this agent.</p>
           ) : (
             <div className="space-y-4">
-              {agent.ailments.map((ailment) => (
-                <Link href={`/ailments/${ailment.id}`} key={ailment.id}>
-                  <div className="bg-white p-4 rounded-lg shadow hover:shadow-lg cursor-pointer transition">
-                    <h3 className="text-lg font-semibold text-gray-900">{ailment.name}</h3>
-                    <p className="text-sm text-gray-600">Severity: {ailment.severity}</p>
-                  </div>
-                </Link>
-              ))}
+              {Array.isArray(agent.ailments) &&
+                agent.ailments.map((ailment) => (
+                  <Link href={`/ailments/${ailment?.id}`} key={ailment?.id}>
+                    <div className="bg-white p-4 rounded-lg shadow hover:shadow-lg cursor-pointer transition">
+                      <h3 className="text-lg font-semibold text-gray-900">{ailment?.name}</h3>
+                      <p className="text-sm text-gray-600">Severity: {ailment?.severity}</p>
+                    </div>
+                  </Link>
+                ))}
             </div>
           )}
         </div>

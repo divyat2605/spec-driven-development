@@ -40,7 +40,19 @@ export default function DashboardPage() {
       try {
         const response = await fetch('/api/dashboard');
         if (response.ok) {
-          setData(await response.json());
+          const raw = await response.json();
+          setData({
+            ...raw,
+            upcomingAppointments: Array.isArray(raw?.upcomingAppointments)
+              ? raw.upcomingAppointments
+              : [],
+            recentAgents: Array.isArray(raw?.recentAgents) ? raw.recentAgents : [],
+            appointments: raw?.appointments ?? {
+              scheduled: 0,
+              completed: 0,
+              cancelled: 0,
+            },
+          });
         }
       } catch (error) {
         console.error('Error fetching dashboard:', error);
@@ -86,7 +98,7 @@ export default function DashboardPage() {
                 </span>
                 Agents
               </p>
-              <p className="text-4xl font-bold text-indigo-600 mt-2">{data.totalAgents}</p>
+              <p className="text-4xl font-bold text-indigo-600 mt-2">{data?.totalAgents}</p>
             </div>
             <div className={`${statCardBase} border-l-blue-500`}>
               <p className="text-sm font-medium text-gray-600">
@@ -95,7 +107,7 @@ export default function DashboardPage() {
                 </span>
                 Ailments
               </p>
-              <p className="text-4xl font-bold text-blue-600 mt-2">{data.totalAilments}</p>
+              <p className="text-4xl font-bold text-blue-600 mt-2">{data?.totalAilments}</p>
             </div>
             <div className={`${statCardBase} border-l-green-500`}>
               <p className="text-sm font-medium text-gray-600">
@@ -104,7 +116,7 @@ export default function DashboardPage() {
                 </span>
                 Therapy types
               </p>
-              <p className="text-4xl font-bold text-green-600 mt-2">{data.totalTherapyTypes}</p>
+              <p className="text-4xl font-bold text-green-600 mt-2">{data?.totalTherapyTypes}</p>
             </div>
             <div className={`${statCardBase} border-l-purple-500`}>
               <p className="text-sm font-medium text-gray-600">
@@ -114,7 +126,7 @@ export default function DashboardPage() {
                 Scheduled
               </p>
               <p className="text-4xl font-bold text-amber-600 mt-2">
-                {data.appointments.scheduled}
+                {data.appointments?.scheduled}
               </p>
             </div>
             <div className={`${statCardBase} border-l-indigo-500`}>
@@ -125,7 +137,7 @@ export default function DashboardPage() {
                 Completed
               </p>
               <p className="text-4xl font-bold text-green-600 mt-2">
-                {data.appointments.completed}
+                {data.appointments?.completed}
               </p>
             </div>
             <div className={`${statCardBase} border-l-blue-500`}>
@@ -136,7 +148,7 @@ export default function DashboardPage() {
                 Cancelled
               </p>
               <p className="text-4xl font-bold text-red-600 mt-2">
-                {data.appointments.cancelled}
+                {data.appointments?.cancelled}
               </p>
             </div>
           </div>
@@ -145,30 +157,31 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <section>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Upcoming appointments</h2>
-            {data.upcomingAppointments.length === 0 ? (
+            {!Array.isArray(data.upcomingAppointments) || data.upcomingAppointments.length === 0 ? (
               <p className="text-gray-600 bg-white p-6 rounded-lg shadow border border-gray-100">
                 No upcoming scheduled appointments.
               </p>
             ) : (
               <ul className="space-y-3">
-                {data.upcomingAppointments.map((a) => (
-                  <li key={a.id}>
-                    <Link
-                      href={`/appointments/${a.id}`}
-                      className="block bg-white p-4 rounded-lg shadow border border-gray-100 border-l-4 border-l-blue-500 pl-5 hover:shadow-md hover:scale-[1.02] transition duration-200"
-                    >
-                      <div className="flex flex-wrap items-center gap-2 justify-between">
-                        <p className="font-semibold text-gray-900">
-                          {a.therapyType.name} — {a.agent.name}
+                {Array.isArray(data.upcomingAppointments) &&
+                  data.upcomingAppointments.map((a) => (
+                    <li key={a?.id}>
+                      <Link
+                        href={`/appointments/${a?.id}`}
+                        className="block bg-white p-4 rounded-lg shadow border border-gray-100 border-l-4 border-l-blue-500 pl-5 hover:shadow-md hover:scale-[1.02] transition duration-200"
+                      >
+                        <div className="flex flex-wrap items-center gap-2 justify-between">
+                          <p className="font-semibold text-gray-900">
+                            {a?.therapyType?.name} — {a?.agent?.name}
+                          </p>
+                          <StatusBadge status={a?.status ?? ''} variant="appointment" />
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {a?.dateTime ? new Date(a.dateTime).toLocaleString() : ''}
                         </p>
-                        <StatusBadge status={a.status} variant="appointment" />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {new Date(a.dateTime).toLocaleString()}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
+                      </Link>
+                    </li>
+                  ))}
               </ul>
             )}
             <p className="mt-4">
@@ -183,28 +196,32 @@ export default function DashboardPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent agents</h2>
-            {data.recentAgents.length === 0 ? (
+            {!Array.isArray(data.recentAgents) || data.recentAgents.length === 0 ? (
               <p className="text-gray-600 bg-white p-6 rounded-lg shadow border border-gray-100">
                 No agents yet.
               </p>
             ) : (
               <ul className="space-y-3">
-                {data.recentAgents.map((agent) => (
-                  <li key={agent.id}>
-                    <Link
-                      href={`/agents/${agent.id}`}
-                      className="block bg-white p-4 rounded-lg shadow border border-gray-100 border-l-4 border-l-indigo-500 pl-5 hover:shadow-md hover:scale-[1.02] transition duration-200"
-                    >
-                      <div className="flex flex-wrap items-center gap-2 justify-between">
-                        <p className="font-semibold text-gray-900">{agent.name}</p>
-                        <StatusBadge status={agent.status} variant="agent" />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Added {new Date(agent.createdAt).toLocaleDateString()}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
+                {Array.isArray(data.recentAgents) &&
+                  data.recentAgents.map((agent) => (
+                    <li key={agent?.id}>
+                      <Link
+                        href={`/agents/${agent?.id}`}
+                        className="block bg-white p-4 rounded-lg shadow border border-gray-100 border-l-4 border-l-indigo-500 pl-5 hover:shadow-md hover:scale-[1.02] transition duration-200"
+                      >
+                        <div className="flex flex-wrap items-center gap-2 justify-between">
+                          <p className="font-semibold text-gray-900">{agent?.name}</p>
+                          <StatusBadge status={agent?.status ?? ''} variant="agent" />
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Added{' '}
+                          {agent?.createdAt
+                            ? new Date(agent.createdAt).toLocaleDateString()
+                            : ''}
+                        </p>
+                      </Link>
+                    </li>
+                  ))}
               </ul>
             )}
             <p className="mt-4">

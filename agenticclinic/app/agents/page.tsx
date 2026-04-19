@@ -22,7 +22,8 @@ export default function AgentsList() {
       try {
         const response = await fetch('/api/agents');
         if (response.ok) {
-          setAgents(await response.json());
+          const raw = await response.json();
+          setAgents(Array.isArray(raw) ? raw : []);
         }
       } catch (error) {
         console.error('Error fetching agents:', error);
@@ -86,19 +87,23 @@ export default function AgentsList() {
           <p className="text-gray-600">No agents found. Create one to get started!</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {agents.map((agent) => (
-              <Link href={`/agents/${agent.id}`} key={agent.id}>
-                <div className="h-full cursor-pointer rounded-xl border border-gray-100 border-l-4 border-l-indigo-500 bg-white p-6 shadow-md transition duration-200 hover:scale-105 hover:shadow-lg">
-                  <h3 className="text-xl font-bold text-gray-900">{agent.name}</h3>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <StatusBadge status={agent.status} variant="agent" />
+            {Array.isArray(agents) &&
+              agents.map((agent) => (
+                <Link href={`/agents/${agent?.id}`} key={agent?.id}>
+                  <div className="h-full cursor-pointer rounded-xl border border-gray-100 border-l-4 border-l-indigo-500 bg-white p-6 shadow-md transition duration-200 hover:scale-105 hover:shadow-lg">
+                    <h3 className="text-xl font-bold text-gray-900">{agent?.name}</h3>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <StatusBadge status={agent?.status ?? ''} variant="agent" />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-gray-500">
+                      Ailments:{' '}
+                      <span className="text-gray-900">
+                        {Array.isArray(agent?.ailments) ? agent.ailments.length : 0}
+                      </span>
+                    </p>
                   </div>
-                  <p className="mt-3 text-sm font-medium text-gray-500">
-                    Ailments: <span className="text-gray-900">{agent.ailments.length}</span>
-                  </p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
           </div>
         )}
       </main>

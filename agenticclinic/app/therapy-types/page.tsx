@@ -22,7 +22,8 @@ export default function TherapyTypesList() {
       try {
         const response = await fetch('/api/therapy-types');
         if (response.ok) {
-          setTherapyTypes(await response.json());
+          const raw = await response.json();
+          setTherapyTypes(Array.isArray(raw) ? raw : []);
         }
       } catch (error) {
         console.error('Error fetching therapy types:', error);
@@ -115,19 +116,22 @@ export default function TherapyTypesList() {
           <p className="text-gray-600">No therapy types yet. Add one to get started.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {therapyTypes.map((therapyType) => (
-              <Link
-                href={`/therapy-types/${therapyType.id}`}
-                key={therapyType.id}
-                className="block bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
-              >
-                <h3 className="text-xl font-semibold text-gray-900">{therapyType.name}</h3>
-                <p className="text-sm text-gray-600 mt-2">Duration: {therapyType.duration} minutes</p>
-                {therapyType.description && (
-                  <p className="text-sm text-gray-600 mt-2">{therapyType.description}</p>
-                )}
-              </Link>
-            ))}
+            {Array.isArray(therapyTypes) &&
+              therapyTypes.map((therapyType) => (
+                <Link
+                  href={`/therapy-types/${therapyType?.id}`}
+                  key={therapyType?.id}
+                  className="block bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
+                >
+                  <h3 className="text-xl font-semibold text-gray-900">{therapyType?.name}</h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Duration: {therapyType?.duration} minutes
+                  </p>
+                  {therapyType?.description && (
+                    <p className="text-sm text-gray-600 mt-2">{therapyType.description}</p>
+                  )}
+                </Link>
+              ))}
           </div>
         )}
       </main>

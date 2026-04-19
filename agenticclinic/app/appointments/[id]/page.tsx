@@ -82,10 +82,13 @@ export default function AppointmentDetail() {
 
         <div className="bg-white p-6 rounded-lg shadow mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Appointment Details</h1>
-          <p className="text-lg text-gray-600 mb-2">Agent: {appointment.agent.name}</p>
-          <p className="text-lg text-gray-600 mb-2">Therapy: {appointment.therapyType.name}</p>
+          <p className="text-lg text-gray-600 mb-2">Agent: {appointment.agent?.name}</p>
+          <p className="text-lg text-gray-600 mb-2">Therapy: {appointment.therapyType?.name}</p>
           <p className="text-lg text-gray-600 mb-2">
-            Date: {new Date(appointment.dateTime).toLocaleString()}
+            Date:{' '}
+            {appointment.dateTime
+              ? new Date(appointment.dateTime).toLocaleString()
+              : ''}
           </p>
           <p className="text-lg text-gray-600 mb-2">Duration: {appointment.duration} minutes</p>
           <p className="text-lg text-gray-600 mb-2">Status: {appointment.status}</p>

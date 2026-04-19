@@ -25,6 +25,7 @@ export default function NewAppointmentPage() {
   const [duration, setDuration] = useState(60);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
+  const [listsLoading, setListsLoading] = useState(true);
 
   useEffect(() => {
     const loadLists = async () => {
@@ -35,14 +36,18 @@ export default function NewAppointmentPage() {
         ]);
 
         if (agentRes.ok) {
-          setAgents(await agentRes.json());
+          const raw = await agentRes.json();
+          setAgents(Array.isArray(raw) ? raw : []);
         }
 
         if (therapyRes.ok) {
-          setTherapyTypes(await therapyRes.json());
+          const raw = await therapyRes.json();
+          setTherapyTypes(Array.isArray(raw) ? raw : []);
         }
       } catch (err) {
         console.error('Error loading appointment form data:', err);
+      } finally {
+        setListsLoading(false);
       }
     };
 
@@ -51,8 +56,10 @@ export default function NewAppointmentPage() {
 
   const handleTherapyChange = (value: string) => {
     setTherapyTypeId(value);
-    const selected = therapyTypes.find((type) => type.id === value);
-    if (selected) {
+    const selected = Array.isArray(therapyTypes)
+      ? therapyTypes.find((type) => type?.id === value)
+      : undefined;
+    if (selected?.duration != null) {
       setDuration(selected.duration);
     }
   };
@@ -69,8 +76,10 @@ export default function NewAppointmentPage() {
     try {
       const listRes = await fetch('/api/appointments');
       if (listRes.ok) {
-        const appointments: { agentId: string; therapyTypeId: string; dateTime: string }[] =
-          await listRes.json();
+        const raw = await listRes.json();
+        const appointments = Array.isArray(raw)
+          ? (raw as { agentId: string; therapyTypeId: string; dateTime: string }[])
+          : [];
         const targetTime = new Date(dateTime).getTime();
         const duplicate = appointments.some(
           (a) =>
@@ -110,6 +119,16 @@ export default function NewAppointmentPage() {
     }
   };
 
+  if (listsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <p className="text-gray-600">Loading form...</p>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -135,11 +154,12 @@ export default function NewAppointmentPage() {
                   className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">Select agent</option>
-                  {agents.map((agent) => (
-                    <option key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </option>
-                  ))}
+                  {Array.isArray(agents) &&
+                    agents.map((agent) => (
+                      <option key={agent?.id} value={agent?.id}>
+                        {agent?.name}
+                      </option>
+                    ))}
                 </select>
               </label>
 
@@ -151,11 +171,12 @@ export default function NewAppointmentPage() {
                   className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">Select therapy type</option>
-                  {therapyTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
+                  {Array.isArray(therapyTypes) &&
+                    therapyTypes.map((type) => (
+                      <option key={type?.id} value={type?.id}>
+                        {type?.name}
+                      </option>
+                    ))}
                 </select>
               </label>
             </div>

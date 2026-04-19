@@ -22,7 +22,8 @@ export default function AppointmentsList() {
       try {
         const response = await fetch('/api/appointments');
         if (response.ok) {
-          setAppointments(await response.json());
+          const raw = await response.json();
+          setAppointments(Array.isArray(raw) ? raw : []);
         }
       } catch (error) {
         console.error('Error fetching appointments:', error);
@@ -50,21 +51,24 @@ export default function AppointmentsList() {
           <p className="text-gray-600">No appointments scheduled yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {appointments.map((appointment) => (
-              <Link
-                href={`/appointments/${appointment.id}`}
-                key={appointment.id}
-                className="block bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
-              >
-                <h3 className="text-xl font-semibold text-gray-900">
-                  {appointment.therapyType.name} for {appointment.agent.name}
-                </h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  {new Date(appointment.dateTime).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-600">Status: {appointment.status}</p>
-              </Link>
-            ))}
+            {Array.isArray(appointments) &&
+              appointments.map((appointment) => (
+                <Link
+                  href={`/appointments/${appointment?.id}`}
+                  key={appointment?.id}
+                  className="block bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
+                >
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {appointment?.therapyType?.name} for {appointment?.agent?.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    {appointment?.dateTime
+                      ? new Date(appointment.dateTime).toLocaleString()
+                      : ''}
+                  </p>
+                  <p className="text-sm text-gray-600">Status: {appointment?.status}</p>
+                </Link>
+              ))}
           </div>
         )}
       </main>
