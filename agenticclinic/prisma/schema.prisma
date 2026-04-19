@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id           String        @id @default(cuid())
+  name         String
+  status       String        @default("active") // e.g., "active", "recovering", "resting"
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  ailments     Ailment[]
+  appointments Appointment[]
+}
+
+model Ailment {
+  id          String      @id @default(cuid())
+  name        String
+  severity    String      @default("moderate") // e.g., "mild", "moderate", "severe"
+  description String?
+  agentId     String
+  agent       Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  treatments  Treatment[]
+}
+
+model TherapyType {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  duration     Int           @default(60) // duration in minutes
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  treatments   Treatment[]
+  appointments Appointment[]
+}
+
+model Treatment {
+  id            String      @id @default(cuid())
+  ailmentId     String
+  ailment       Ailment     @relation(fields: [ailmentId], references: [id], onDelete: Cascade)
+  therapyTypeId String
+  therapyType   TherapyType @relation(fields: [therapyTypeId], references: [id])
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Appointment {
+  id            String      @id @default(cuid())
+  agentId       String
+  agent         Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  therapyTypeId String
+  therapyType   TherapyType @relation(fields: [therapyTypeId], references: [id])
+  dateTime      DateTime
+  duration      Int         @default(60) // duration in minutes
+  notes         String?
+  status        String      @default("scheduled") // e.g., "scheduled", "completed", "cancelled"
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
