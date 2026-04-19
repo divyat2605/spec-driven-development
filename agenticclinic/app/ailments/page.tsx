@@ -34,16 +34,9 @@ export default function AilmentsList() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/" className="text-2xl font-bold text-indigo-600">
-            AgentClinic
-          </Link>
-        </nav>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Ailments</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">Ailments</h1>
+        <p className="text-gray-600 mb-8">Browse ailments linked to agents.</p>
 
         {loading ? (
           <p className="text-gray-600">Loading ailments...</p>
@@ -53,11 +46,19 @@ export default function AilmentsList() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ailments.map((ailment) => (
               <Link href={`/ailments/${ailment.id}`} key={ailment.id}>
-                <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg cursor-pointer transition">
-                  <h3 className="text-xl font-semibold text-gray-900">{ailment.name}</h3>
-                  <p className="text-sm text-gray-600 mt-2">Severity: {ailment.severity}</p>
-                  <p className="text-sm text-gray-600">Agent: {ailment.agent.name}</p>
-                  <p className="text-sm text-gray-600">Treatments: {ailment.treatments.length}</p>
+                <div className="h-full cursor-pointer rounded-xl border border-gray-100 border-l-4 border-l-teal-500 bg-white p-6 shadow-md transition duration-200 hover:scale-105 hover:shadow-lg">
+                  <h3 className="text-xl font-bold text-gray-900">{ailment.name}</h3>
+                  <p className="mt-2 text-sm font-medium text-gray-500">
+                    Severity:{' '}
+                    <span className="font-semibold text-gray-800">{ailment.severity}</span>
+                  </p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Agent:{' '}
+                    <span className="font-medium text-gray-900">{ailment.agent.name}</span>
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-gray-500">
+                    Treatments: <span className="text-gray-900">{ailment.treatments.length}</span>
+                  </p>
                 </div>
               </Link>
             ))}

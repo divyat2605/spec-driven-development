@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const ailment = await prisma.ailment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { agent: true, treatments: true },
     });
 
@@ -21,20 +20,19 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching ailment:', error);
     return NextResponse.json({ error: 'Failed to fetch ailment' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { name, severity, description } = await request.json();
 
     const ailment = await prisma.ailment.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(severity && { severity }),
@@ -46,25 +44,22 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating ailment:', error);
     return NextResponse.json({ error: 'Failed to update ailment' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.ailment.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Ailment deleted' });
   } catch (error) {
     console.error('Error deleting ailment:', error);
     return NextResponse.json({ error: 'Failed to delete ailment' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -13,7 +13,7 @@ datasource db {
 model Agent {
   id           String        @id @default(cuid())
   name         String
-  status       String        @default("active") // e.g., "active", "recovering", "resting"
+  status       String        @default("active")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   ailments     Ailment[]
@@ -23,7 +23,7 @@ model Agent {
 model Ailment {
   id          String      @id @default(cuid())
   name        String
-  severity    String      @default("moderate") // e.g., "mild", "moderate", "severe"
+  severity    String      @default("moderate")
   description String?
   agentId     String
   agent       Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
@@ -36,7 +36,7 @@ model TherapyType {
   id           String        @id @default(cuid())
   name         String
   description  String?
-  duration     Int           @default(60) // duration in minutes
+  duration     Int           @default(60)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   treatments   Treatment[]
@@ -61,9 +61,9 @@ model Appointment {
   therapyTypeId String
   therapyType   TherapyType @relation(fields: [therapyTypeId], references: [id])
   dateTime      DateTime
-  duration      Int         @default(60) // duration in minutes
+  duration      Int         @default(60)
   notes         String?
-  status        String      @default("scheduled") // e.g., "scheduled", "completed", "cancelled"
+  status        String      @default("scheduled")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }

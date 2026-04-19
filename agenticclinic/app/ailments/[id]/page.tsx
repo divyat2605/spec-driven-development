@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 interface Ailment {
   id: string;
@@ -17,6 +17,7 @@ interface Ailment {
 
 export default function AilmentDetail() {
   const params = useParams();
+  const router = useRouter();
   const ailmentId = params.id as string;
   const [ailment, setAilment] = useState<Ailment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +47,7 @@ export default function AilmentDetail() {
     try {
       const response = await fetch(`/api/ailments/${ailmentId}`, { method: 'DELETE' });
       if (response.ok) {
-        window.location.href = `/agents/${ailment.agent.id}`;
+        router.push(`/agents/${ailment.agent.id}`);
       }
     } catch (error) {
       console.error('Error deleting ailment:', error);
@@ -71,14 +72,6 @@ export default function AilmentDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/" className="text-2xl font-bold text-indigo-600">
-            AgentClinic
-          </Link>
-        </nav>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/ailments" className="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
           ← Back to Ailments

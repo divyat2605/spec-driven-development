@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
     const agents = await prisma.agent.findMany({
-      include: { ailments: true, appointments: true },
+      include: { ailments: true, appointments: { include: { therapyType: true } } },
     });
     return NextResponse.json(agents);
   } catch (error) {
     console.error('Error fetching agents:', error);
     return NextResponse.json({ error: 'Failed to fetch agents' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -33,7 +29,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating agent:', error);
     return NextResponse.json({ error: 'Failed to create agent' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

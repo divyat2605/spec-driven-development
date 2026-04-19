@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const agent = await prisma.agent.findUnique({
-      where: { id: params.id },
-      include: { ailments: true, appointments: true },
+      where: { id },
+      include: { ailments: true, appointments: { include: { therapyType: true } } },
     });
 
     if (!agent) {
@@ -21,20 +20,19 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching agent:', error);
     return NextResponse.json({ error: 'Failed to fetch agent' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { name, status } = await request.json();
 
     const agent = await prisma.agent.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(status && { status }),
@@ -45,25 +43,22 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating agent:', error);
     return NextResponse.json({ error: 'Failed to update agent' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.agent.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Agent deleted' });
   } catch (error) {
     console.error('Error deleting agent:', error);
     return NextResponse.json({ error: 'Failed to delete agent' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
@@ -12,8 +10,6 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching ailments:', error);
     return NextResponse.json({ error: 'Failed to fetch ailments' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -41,7 +37,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating ailment:', error);
     return NextResponse.json({ error: 'Failed to create ailment' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

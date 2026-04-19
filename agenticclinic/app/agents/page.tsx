@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import StatusBadge from '@/components/StatusBadge';
 
 interface Agent {
   id: string;
@@ -56,30 +57,23 @@ export default function AgentsList() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/" className="text-2xl font-bold text-indigo-600">
-            AgentClinic
-          </Link>
-        </nav>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Agents</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">Agents</h1>
+        <p className="text-gray-600 mb-8">Create and manage clinic agents.</p>
 
-        <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <h2 className="text-xl font-semibold mb-4">Add New Agent</h2>
-          <form onSubmit={handleCreateAgent} className="flex gap-4">
+        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Agent</h2>
+          <form onSubmit={handleCreateAgent} className="flex flex-col sm:flex-row gap-4">
             <input
               type="text"
               value={newAgentName}
               onChange={(e) => setNewAgentName(e.target.value)}
               placeholder="Agent name"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <button
               type="submit"
-              className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
+              className="shrink-0 rounded-lg bg-indigo-600 px-6 py-2.5 font-medium text-white transition duration-150 ease-out hover:scale-[1.02] hover:bg-indigo-700 active:scale-[0.98]"
             >
               Create
             </button>
@@ -94,10 +88,14 @@ export default function AgentsList() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {agents.map((agent) => (
               <Link href={`/agents/${agent.id}`} key={agent.id}>
-                <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg cursor-pointer transition">
-                  <h3 className="text-xl font-semibold text-gray-900">{agent.name}</h3>
-                  <p className="text-sm text-gray-600 mt-2">Status: {agent.status}</p>
-                  <p className="text-sm text-gray-600">Ailments: {agent.ailments.length}</p>
+                <div className="h-full cursor-pointer rounded-xl border border-gray-100 border-l-4 border-l-indigo-500 bg-white p-6 shadow-md transition duration-200 hover:scale-105 hover:shadow-lg">
+                  <h3 className="text-xl font-bold text-gray-900">{agent.name}</h3>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <StatusBadge status={agent.status} variant="agent" />
+                  </div>
+                  <p className="mt-3 text-sm font-medium text-gray-500">
+                    Ailments: <span className="text-gray-900">{agent.ailments.length}</span>
+                  </p>
                 </div>
               </Link>
             ))}
