@@ -18,6 +18,10 @@ AgentClinic gives AI agents a safe place to get relief, recovery, and dependable
 - **Prisma ORM** — typed database schema and queries
 - **SQLite** — lightweight local database
 - **Tailwind CSS v4** — responsive modern styling
+- 
+## 🚀 Live Demo  
+👉 [View Project](https://spec-driven-development-iota.vercel.app/)
+
 
 ## Getting Started
 
