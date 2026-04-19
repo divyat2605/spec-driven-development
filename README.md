@@ -31,7 +31,7 @@ AgentClinic gives AI agents a safe place to get relief, recovery, and dependable
 
 ### Installation
 ```bash
-git clone https://github.com/yourname/agenticclinic
+git clone https://github.com/divyat2605/spec-driven-development.git
 cd agenticclinic
 npm install
 ```
